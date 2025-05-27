@@ -1,4 +1,4 @@
-package com.guntamania.geminiotameshi
+package com.guntamania.geminiotameshi.baking
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.BorderStroke
@@ -37,6 +37,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.guntamania.geminiotameshi.R
+import com.guntamania.geminiotameshi.ui.core.UiState
 
 val images = arrayOf(
     // Image generated using Gemini from the prompt "cupcake image"
@@ -54,6 +57,7 @@ val imageDescriptions = arrayOf(
 
 @Composable
 fun BakingScreen(
+    navController: NavController,
     bakingViewModel: BakingViewModel = viewModel()
 ) {
     val selectedImage = remember { mutableIntStateOf(0) }
@@ -150,8 +154,8 @@ fun BakingScreen(
     }
 }
 
-@Preview(showSystemUi = true)
-@Composable
-fun BakingScreenPreview() {
-    BakingScreen()
-}
+//@Preview(showSystemUi = true)
+//@Composable
+//fun BakingScreenPreview() {
+//    BakingScreen()
+//}

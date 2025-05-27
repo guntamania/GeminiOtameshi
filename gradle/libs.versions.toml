@@ -1,5 +1,6 @@
 [versions]
-agp = "8.9.2"
+agp = "8.9.3"
+fragmentCompose = "1.8.7"
 kotlin = "2.0.21"
 coreKtx = "1.10.1"
 junit = "4.13.2"
@@ -11,9 +12,16 @@ activityCompose = "1.8.0"
 composeBom = "2024.09.00"
 generativeai = "0.9.0"
 googleAndroidLibrariesMapsplatformSecretsGradlePlugin = "2.0.1"
+navigationUi = "2.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-fragment = { module = "androidx.fragment:fragment", version.ref = "fragmentCompose" }
+androidx-fragment-compose = { module = "androidx.fragment:fragment-compose", version.ref = "fragmentCompose" }
+androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentCompose" }
+androidx-navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref="navigationUi" }
+androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref="navigationUi" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref="navigationUi" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

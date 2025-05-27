@@ -1,4 +1,4 @@
-package com.guntamania.geminiotameshi
+package com.guntamania.geminiotameshi.ui.core
 
 /**
  * A sealed hierarchy describing the state of the text generation.
