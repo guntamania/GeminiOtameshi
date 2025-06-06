@@ -1,23 +1,24 @@
 package com.guntamania.geminiotameshi.baking
 
-import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import com.guntamania.geminiotameshi.BuildConfig
-import com.guntamania.geminiotameshi.ui.core.UiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class BakingViewModel : ViewModel() {
-    private val _uiState: MutableStateFlow<UiState> =
-        MutableStateFlow(UiState.Initial)
-    val uiState: StateFlow<UiState> =
+    private val _uiState: MutableStateFlow<BakingUiState> =
+        MutableStateFlow(BakingUiState.Initial)
+    val uiState: StateFlow<BakingUiState> =
         _uiState.asStateFlow()
+
+    private var messages: MutableList<BakingViewData.Entry> = mutableListOf()
 
     private val generativeModel = GenerativeModel(
         modelName = "gemini-1.5-flash",
@@ -27,7 +28,7 @@ class BakingViewModel : ViewModel() {
     fun sendPrompt(
         prompt: String
     ) {
-        _uiState.value = UiState.Loading
+        _uiState.value = BakingUiState.Loading
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -37,10 +38,16 @@ class BakingViewModel : ViewModel() {
                     }
                 )
                 response.text?.let { outputContent ->
-                    _uiState.value = UiState.Success(outputContent)
+                    messages.add(
+                        BakingViewData.Entry(
+                            message = outputContent,
+                            date = Date(),
+                        )
+                    )
+                    _uiState.value = BakingUiState.Success(BakingViewData(messages))
                 }
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.localizedMessage ?: "")
+                _uiState.value = BakingUiState.Error(e.localizedMessage ?: "")
             }
         }
     }

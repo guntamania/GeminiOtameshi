@@ -1,27 +1,27 @@
-package com.guntamania.geminiotameshi.ui.core
+package com.guntamania.geminiotameshi.baking
 
 /**
  * A sealed hierarchy describing the state of the text generation.
  */
-sealed interface UiState {
+sealed interface BakingUiState {
 
     /**
      * Empty state when the screen is first shown
      */
-    object Initial : UiState
+    data object Initial : BakingUiState
 
     /**
      * Still loading
      */
-    object Loading : UiState
+    data object Loading : BakingUiState
 
     /**
      * Text has been generated
      */
-    data class Success(val outputText: String) : UiState
+    data class Success(val data: BakingViewData) : BakingUiState
 
     /**
      * There was an error generating text
      */
-    data class Error(val errorMessage: String) : UiState
+    data class Error(val errorMessage: String) : BakingUiState
 }
