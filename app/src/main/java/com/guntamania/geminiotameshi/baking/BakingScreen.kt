@@ -77,32 +77,6 @@ fun BakingScreen(
         Column(
             modifier = Modifier.padding(innerPadding).fillMaxSize()
         ) {
-
-            Row(
-                modifier = Modifier.padding(all = 16.dp)
-            ) {
-                TextField(
-                    value = prompt,
-                    label = { Text(stringResource(R.string.label_prompt)) },
-                    onValueChange = { prompt = it },
-                    modifier = Modifier
-                        .weight(0.8f)
-                        .padding(end = 16.dp)
-                        .align(Alignment.CenterVertically)
-                )
-
-                Button(
-                    onClick = {
-                        bakingViewModel.sendPrompt(prompt)
-                    },
-                    enabled = prompt.isNotEmpty(),
-                    modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                ) {
-                    Text(text = stringResource(R.string.action_go))
-                }
-            }
-
             if (uiState is BakingUiState.Loading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
             } else {
@@ -131,7 +105,7 @@ fun BakingScreen(
 
                 val scrollState = rememberScrollState()
 
-                LazyColumn(Modifier.fillMaxSize()) {
+                LazyColumn(Modifier.fillMaxSize().weight(1f)) {
                     items(messages.size) {
                         ListItem(
                             result = messages.get(it),
@@ -139,6 +113,31 @@ fun BakingScreen(
                             textColor = textColor
                         )
                     }
+                }
+            }
+
+            Row(
+                modifier = Modifier.padding(all = 16.dp)
+            ) {
+                TextField(
+                    value = prompt,
+                    label = { Text(stringResource(R.string.label_prompt)) },
+                    onValueChange = { prompt = it },
+                    modifier = Modifier
+                        .weight(0.8f)
+                        .padding(end = 16.dp)
+                        .align(Alignment.CenterVertically)
+                )
+
+                Button(
+                    onClick = {
+                        bakingViewModel.sendPrompt(prompt)
+                    },
+                    enabled = prompt.isNotEmpty(),
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                ) {
+                    Text(text = stringResource(R.string.action_go))
                 }
             }
         }
