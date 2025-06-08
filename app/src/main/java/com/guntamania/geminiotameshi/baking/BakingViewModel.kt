@@ -2,11 +2,9 @@ package com.guntamania.geminiotameshi.baking
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.type.content
-import com.guntamania.geminiotameshi.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import com.guntamania.geminiotameshi.repository.PromptRepository
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -20,10 +18,7 @@ class BakingViewModel : ViewModel() {
 
     private val _messages = MutableStateFlow<List<BakingViewData.Entry>>(emptyList())
 
-    private val generativeModel = GenerativeModel(
-        modelName = "gemini-1.5-flash",
-        apiKey = BuildConfig.apiKey
-    )
+    private val promptRepository = PromptRepository()
 
     fun sendPrompt(
         prompt: String
@@ -32,14 +27,10 @@ class BakingViewModel : ViewModel() {
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = generativeModel.generateContent(
-                    content {
-                        text(prompt)
-                    }
-                )
-                response.text?.let { outputContent ->
+                val outputContent = promptRepository.generateContent(prompt)
+                outputContent?.let {
                     _messages.value += BakingViewData.Entry(
-                        message = outputContent,
+                        message = it,
                         date = Date(),
                     )
                     _uiState.value = BakingUiState.Success(BakingViewData(_messages.value))
