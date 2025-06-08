@@ -25,6 +25,12 @@ class BakingViewModel : ViewModel() {
     ) {
         _uiState.value = BakingUiState.Loading
 
+        _messages.value += BakingViewData.Entry(
+            message = prompt,
+            date = Date(),
+            sender = BakingViewData.Sender.YOU
+        );
+
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val outputContent = promptRepository.generateContent(prompt)
@@ -32,6 +38,7 @@ class BakingViewModel : ViewModel() {
                     _messages.value += BakingViewData.Entry(
                         message = it,
                         date = Date(),
+                        sender = BakingViewData.Sender.AI
                     )
                     _uiState.value = BakingUiState.Success(BakingViewData(_messages.value))
                 }

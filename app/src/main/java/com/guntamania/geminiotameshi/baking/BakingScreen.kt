@@ -1,6 +1,8 @@
 package com.guntamania.geminiotameshi.baking
 
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -75,7 +78,9 @@ fun BakingScreen(
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
         Column(
-            modifier = Modifier.padding(innerPadding).fillMaxSize()
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
         ) {
             if (uiState is BakingUiState.Loading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -88,7 +93,8 @@ fun BakingScreen(
                             listOf(
                                 BakingViewData.Entry(
                                     date = Date(),
-                                    message = (uiState as BakingUiState.Error).errorMessage
+                                    message = (uiState as BakingUiState.Error).errorMessage,
+                                    sender = BakingViewData.Sender.SYSTEM
                                 )
                             )
                         }
@@ -105,10 +111,15 @@ fun BakingScreen(
 
                 val scrollState = rememberScrollState()
 
-                LazyColumn(Modifier.fillMaxSize().weight(1f)) {
+                LazyColumn(
+                    Modifier
+                        .fillMaxSize()
+                        .weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
                     items(messages.size) {
                         ListItem(
-                            result = messages.get(it),
+                            result = messages[it],
                             scrollState = scrollState,
                             textColor = textColor
                         )
@@ -152,7 +163,33 @@ fun ListItem(
     scrollState: ScrollState,
     textColor: Color
 ) {
-    Row(modifier.fillMaxWidth()) {
+    val (
+        startPadding,
+        endPadding,
+        backgroundColor
+    ) = if (result.sender == BakingViewData.Sender.YOU) {
+        Triple(
+            16.dp,
+            0.dp,
+            MaterialTheme.colorScheme.secondaryContainer
+        )
+    } else {
+        Triple(
+            0.dp,
+            16.dp,
+            MaterialTheme.colorScheme.primaryContainer
+        )
+    }
+    Row(
+        modifier
+            .padding(
+                start = startPadding,
+                end = endPadding
+            )
+            .clip(MaterialTheme.shapes.medium)
+            .background(backgroundColor)
+            .fillMaxWidth()
+    ) {
         Text(
             text = result.message,
             textAlign = TextAlign.Start,
