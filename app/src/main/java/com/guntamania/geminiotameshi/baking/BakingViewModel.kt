@@ -18,7 +18,7 @@ class BakingViewModel : ViewModel() {
     val uiState: StateFlow<BakingUiState> =
         _uiState.asStateFlow()
 
-    private var messages: MutableList<BakingViewData.Entry> = mutableListOf()
+    private val _messages = MutableStateFlow<List<BakingViewData.Entry>>(emptyList())
 
     private val generativeModel = GenerativeModel(
         modelName = "gemini-1.5-flash",
@@ -38,13 +38,11 @@ class BakingViewModel : ViewModel() {
                     }
                 )
                 response.text?.let { outputContent ->
-                    messages.add(
-                        BakingViewData.Entry(
-                            message = outputContent,
-                            date = Date(),
-                        )
+                    _messages.value += BakingViewData.Entry(
+                        message = outputContent,
+                        date = Date(),
                     )
-                    _uiState.value = BakingUiState.Success(BakingViewData(messages))
+                    _uiState.value = BakingUiState.Success(BakingViewData(_messages.value))
                 }
             } catch (e: Exception) {
                 _uiState.value = BakingUiState.Error(e.localizedMessage ?: "")
