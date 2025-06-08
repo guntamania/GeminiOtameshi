@@ -8,8 +8,16 @@ data class BakingViewData(
     data class Entry(
         val message: String,
         val date: Date,
-        val sender: Sender
+        val sender: Sender,
+        val state: EntryState = EntryState.Initial
     )
+
+    sealed class EntryState {
+        object Initial : EntryState()
+        object Loading : EntryState()
+        object Success : EntryState()
+        data class Error(val message: String) : EntryState()
+    }
 
     enum class Sender {
         AI,
