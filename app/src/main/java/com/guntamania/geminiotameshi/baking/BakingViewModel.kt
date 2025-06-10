@@ -32,7 +32,7 @@ class BakingViewModel : ViewModel() {
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val outputContent = promptRepository.generateContent(prompt)
+                val outputContent = promptRepository.sendMessage(prompt)
                 outputContent?.let {
                     // Update user message state to Success
                     _messages.value = _messages.value.map { entry ->

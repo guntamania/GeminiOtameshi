@@ -11,8 +11,10 @@ class PromptRepository {
         apiKey = BuildConfig.apiKey
     )
 
-    suspend fun generateContent(prompt: String): String? {
-        val response = generativeModel.generateContent(
+    private val chat = generativeModel.startChat()
+
+    suspend fun sendMessage(prompt: String): String? {
+        val response = chat.sendMessage(
             content {
                 text(prompt)
             }
