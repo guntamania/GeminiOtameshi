@@ -20,13 +20,15 @@ class BakingViewModel : ViewModel() {
         prompt: String
     ) {
         // Add user message with Loading state
-        val userEntry = BakingViewData.Entry(
+        val userMessage = BakingViewData.Entry.Message(
             message = prompt,
             date = Date(),
             sender = BakingViewData.Sender.YOU,
-            state = BakingViewData.EntryState.Loading
         )
-        _messages.value += userEntry
+
+        val loadingMessage = BakingViewData.Entry.Loading
+
+        _messages.value += listOf(userMessage, loadingMessage)
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -34,24 +36,23 @@ class BakingViewModel : ViewModel() {
                 outputContent?.let {
                     // Update user message state to Success
                     _messages.value = _messages.value.map { entry ->
-                        if (entry == userEntry) {
-                            entry.copy(state = BakingViewData.EntryState.Success)
+                        if (entry is BakingViewData.Entry.Loading) {
+                            BakingViewData.Entry.Message(
+                                message = it,
+                                date = Date(),
+                                sender = BakingViewData.Sender.AI,
+                            )
                         } else {
                             entry
                         }
                     }
-                    // Add AI message with Success state
-                    _messages.value += BakingViewData.Entry(
-                        message = it,
-                        date = Date(),
-                        sender = BakingViewData.Sender.AI,
-                        state = BakingViewData.EntryState.Success
-                    )
                 } ?: run {
                     // Handle null output content as an error for the user message
                      _messages.value = _messages.value.map { entry ->
-                        if (entry == userEntry) {
-                            entry.copy(state = BakingViewData.EntryState.Error("Empty response"))
+                        if (entry == userMessage) {
+                            BakingViewData.Entry.Error(
+                                message = "empty response",
+                            )
                         } else {
                             entry
                         }
@@ -60,8 +61,10 @@ class BakingViewModel : ViewModel() {
             } catch (e: Exception) {
                 // Update user message state to Error
                 _messages.value = _messages.value.map { entry ->
-                    if (entry == userEntry) {
-                        entry.copy(state = BakingViewData.EntryState.Error(e.localizedMessage ?: "Unknown error"))
+                    if (entry == userMessage) {
+                        BakingViewData.Entry.Error(
+                            message = e.localizedMessage ?: "Unknown error occurred",
+                        )
                     } else {
                         entry
                     }

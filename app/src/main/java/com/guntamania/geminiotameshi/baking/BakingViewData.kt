@@ -5,18 +5,16 @@ import java.util.Date
 data class BakingViewData(
     val messages: List<Entry>
 ) {
-    data class Entry(
-        val message: String,
-        val date: Date,
-        val sender: Sender,
-        val state: EntryState = EntryState.Initial
-    )
-
-    sealed class EntryState {
-        object Initial : EntryState()
-        object Loading : EntryState()
-        object Success : EntryState()
-        data class Error(val message: String) : EntryState()
+    sealed interface Entry {
+        data class Message(
+            val message: String,
+            val date: Date,
+            val sender: Sender,
+        ): Entry
+        data object Loading: Entry
+        data class Error(
+            val message: String
+        ): Entry
     }
 
     enum class Sender {

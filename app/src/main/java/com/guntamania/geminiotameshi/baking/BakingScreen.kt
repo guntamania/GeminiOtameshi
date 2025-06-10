@@ -81,8 +81,6 @@ fun BakingScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            val scrollState = rememberScrollState()
-
             LazyColumn(
                 Modifier
                     .fillMaxSize()
@@ -92,7 +90,6 @@ fun BakingScreen(
                 items(messages.size) {
                     ListItem(
                         entry = messages[it],
-                        scrollState = scrollState,
                     )
                 }
             }
@@ -130,13 +127,12 @@ fun BakingScreen(
 fun ListItem(
     entry: BakingViewData.Entry,
     modifier: Modifier = Modifier,
-    scrollState: ScrollState,
 ) {
     val (
         startPadding,
         endPadding,
         backgroundColor
-    ) = if (entry.sender == BakingViewData.Sender.YOU) {
+    ) = if (entry is BakingViewData.Entry.Message && entry.sender == BakingViewData.Sender.YOU) {
         Triple(
             16.dp,
             0.dp,
@@ -150,8 +146,8 @@ fun ListItem(
         )
     }
 
-    val textColor = when (entry.state) {
-        is BakingViewData.EntryState.Error -> MaterialTheme.colorScheme.error
+    val textColor = when (entry) {
+        is BakingViewData.Entry.Error -> MaterialTheme.colorScheme.error
         else -> MaterialTheme.colorScheme.onSurface
     }
 
@@ -166,22 +162,24 @@ fun ListItem(
             .fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = entry.message,
-                textAlign = TextAlign.Start,
-                color = textColor,
-                modifier = Modifier.fillMaxWidth()
-            )
-            if (entry.state is BakingViewData.EntryState.Loading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.End))
-            } else if (entry.state is BakingViewData.EntryState.Error) {
-                Text(
-                    text = "Error: ${entry.state.message}",
-                    textAlign = TextAlign.End,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.fillMaxWidth()
-                )
+            when(entry) {
+                is BakingViewData.Entry.Message ->
+                    Text(
+                        text = entry.message,
+                        textAlign = TextAlign.Start,
+                        color = textColor,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                is BakingViewData.Entry.Loading ->
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.End))
+                is BakingViewData.Entry.Error ->
+                    Text(
+                        text = "Error: ${entry.message}",
+                        textAlign = TextAlign.End,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth()
+                    )
             }
         }
     }
