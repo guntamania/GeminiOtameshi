@@ -2,6 +2,8 @@ package com.guntamania.geminiotameshi.baking
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.guntamania.geminiotameshi.datastore.entity.MessageEntity
+import com.guntamania.geminiotameshi.repository.MessageRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import com.guntamania.geminiotameshi.repository.PromptRepository
@@ -15,6 +17,22 @@ class BakingViewModel : ViewModel() {
     val messages: StateFlow<List<BakingViewData.Entry>> = _messages.asStateFlow()
 
     private val promptRepository = PromptRepository()
+    private val messageRepository = MessageRepository()
+
+    fun initialFetch() {
+        viewModelScope.launch {
+            val messages =
+                messageRepository.getAllMessages()
+                .map { record ->
+                    BakingViewData.Entry.Message(
+                        message = record.message,
+                        date = Date(record.date),
+                        sender = BakingViewData.Sender.valueOf(record.sender)
+                    )
+                }
+            _messages.value = messages
+        }
+    }
 
     fun sendPrompt(
         prompt: String
@@ -31,6 +49,13 @@ class BakingViewModel : ViewModel() {
         _messages.value += listOf(userMessage, loadingMessage)
 
         viewModelScope.launch(Dispatchers.IO) {
+            messageRepository.addMessage(
+                MessageEntity(
+                    message = prompt,
+                    date = Date().time,
+                    sender = BakingViewData.Sender.YOU.name
+                )
+            )
             try {
                 val outputContent = promptRepository.sendMessage(prompt)
                 outputContent?.let {
@@ -46,6 +71,14 @@ class BakingViewModel : ViewModel() {
                             entry
                         }
                     }
+
+                    messageRepository.addMessage(
+                        MessageEntity(
+                            message = it,
+                            date = Date().time,
+                            sender = BakingViewData.Sender.AI.name
+                        )
+                    )
                 } ?: run {
                     // Handle null output content as an error for the user message
                      _messages.value = _messages.value.map { entry ->
