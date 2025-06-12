@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +50,11 @@ fun BakingScreen(
     var prompt by rememberSaveable { mutableStateOf(placeholderPrompt) }
     val messages by bakingViewModel.messages.collectAsState()
     val context = LocalContext.current
+
+    // 画面が表示されたときに一度だけ初期化処理を呼び出す
+    LaunchedEffect(Unit) {
+        bakingViewModel.initialFetch()
+    }
 
     Scaffold(
         topBar = {
